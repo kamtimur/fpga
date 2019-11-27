@@ -10,19 +10,25 @@ architecture bench of ellyptic_add_tb is
   component ellyptic_add
   generic(DataWidth : integer);
     port (
-	i_rst_l : in std_logic;
-	i_clk   : in std_logic;
-	i_px    : in std_logic_vector(DataWidth downto 0);
-	i_py    : in std_logic_vector(DataWidth downto 0);
-	i_qx    : in std_logic_vector(DataWidth downto 0);
-  	i_qy    : in std_logic_vector(DataWidth downto 0);
-  	o_rx	: out std_logic_vector(DataWidth downto 0);
-  	o_ry	: out std_logic_vector(DataWidth downto 0)
+		i_rst_l : in std_logic;
+		i_clk   : in std_logic;
+		i_p		: in std_logic_vector(DataWidth downto 0);
+		i_a		: in std_logic_vector(DataWidth downto 0);
+		i_b		: in std_logic_vector(DataWidth downto 0);
+		i_px    : in std_logic_vector(DataWidth downto 0);
+		i_py    : in std_logic_vector(DataWidth downto 0);
+		i_qx    : in std_logic_vector(DataWidth downto 0);
+		i_qy    : in std_logic_vector(DataWidth downto 0);
+		o_rx	: out std_logic_vector(DataWidth downto 0);
+		o_ry	: out std_logic_vector(DataWidth downto 0)
       );
   end component;
 
   signal i_rst_l: std_logic;
   signal i_clk: std_logic;
+  signal i_p: std_logic_vector(DataWidth downto 0);
+  signal i_a: std_logic_vector(DataWidth downto 0);
+  signal i_b: std_logic_vector(DataWidth downto 0);
   signal i_px: std_logic_vector(DataWidth downto 0);
   signal i_py: std_logic_vector(DataWidth downto 0);
   signal i_qx: std_logic_vector(DataWidth downto 0);
@@ -36,9 +42,12 @@ architecture bench of ellyptic_add_tb is
 begin
 
   -- Insert values for generic parameters !!
-  uut: ellyptic_add generic map ( DataWidth => DataWidth )
+  uut: ellyptic_add generic map ( DataWidth =>  DataWidth)
                        port map ( i_rst_l   => i_rst_l,
                                   i_clk     => i_clk,
+                                  i_p       => i_p,
+                                  i_a       => i_a,
+                                  i_b       => i_b,
                                   i_px      => i_px,
                                   i_py      => i_py,
                                   i_qx      => i_qx,
@@ -57,13 +66,16 @@ begin
     wait for 5 ns;
 
     -- Put test bench stimulus code here
-	i_px <= std_logic_vector(to_signed(1, DataWidth+1));
-	i_py <= std_logic_vector(to_signed(2, DataWidth+1));
-	i_qx <= std_logic_vector(to_signed(3, DataWidth+1));
-	i_qy <= std_logic_vector(to_signed(4, DataWidth+1));
+	i_px <= std_logic_vector(to_signed(17, DataWidth+1));
+	i_py <= std_logic_vector(to_signed(10, DataWidth+1));
+	i_qx <= std_logic_vector(to_signed(95, DataWidth+1));
+	i_qy <= std_logic_vector(to_signed(31, DataWidth+1));
+	i_a  <= std_logic_vector(to_signed(2, DataWidth+1));
+	i_b  <= std_logic_vector(to_signed(3, DataWidth+1));
+	i_p  <= std_logic_vector(to_signed(97, DataWidth+1));
 	wait for 1000 ns;
-	assert o_rx=std_logic_vector(to_signed(-3, DataWidth+1)) report "error x" severity error;
-	assert o_ry=std_logic_vector(to_signed(2, DataWidth+1)) report "error y" severity error;
+	assert o_rx=std_logic_vector(to_signed(1, DataWidth+1)) report "error x" severity error;
+	assert o_ry=std_logic_vector(to_signed(54, DataWidth+1)) report "error y" severity error;
     stop_the_clock <= true;
     wait;
   end process;
@@ -78,3 +90,5 @@ begin
   end process;
 
 end;
+ 
+  
