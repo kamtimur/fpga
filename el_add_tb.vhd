@@ -73,9 +73,9 @@ begin
 	i_a  <= std_logic_vector(to_signed(2, DataWidth+1));
 	i_b  <= std_logic_vector(to_signed(3, DataWidth+1));
 	i_p  <= std_logic_vector(to_signed(97, DataWidth+1));
-	wait for 1000 ns;
-	assert o_rx=std_logic_vector(to_signed(1, DataWidth+1)) report "error x" severity error;
-	assert o_ry=std_logic_vector(to_signed(54, DataWidth+1)) report "error y" severity error;
+	wait for clock_period;
+	assert o_rx = std_logic_vector(to_signed(1, DataWidth+1)) report "error x" severity error;
+	assert o_ry = std_logic_vector(to_signed(54, DataWidth+1)) report "error y" severity error;
     stop_the_clock <= true;
     wait;
   end process;
