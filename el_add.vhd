@@ -3,27 +3,27 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use IEEE.math_real.all;
 entity ellyptic_add is
-generic(DataWidth : integer);
+generic(DataWidth : natural);
   port (
-    i_rst_l : in std_logic;
-    i_clk   : in std_logic;
-	i_p		: in std_logic_vector(DataWidth downto 0);
-	i_a		: in std_logic_vector(DataWidth downto 0);
-	i_b		: in std_logic_vector(DataWidth downto 0);
-    i_px    : in std_logic_vector(DataWidth downto 0);
-	i_py    : in std_logic_vector(DataWidth downto 0);
-    i_qx    : in std_logic_vector(DataWidth downto 0);
-	i_qy    : in std_logic_vector(DataWidth downto 0);
-	o_rx	: out std_logic_vector(DataWidth downto 0);
-	o_ry	: out std_logic_vector(DataWidth downto 0)
+    i_rst_l : in 	std_logic;
+    i_clk   : in 	std_logic;
+	i_p		: in 	std_logic_vector(DataWidth-1 downto 0);
+	i_a		: in 	std_logic_vector(DataWidth-1 downto 0);
+	i_b		: in 	std_logic_vector(DataWidth-1 downto 0);
+    i_px    : in 	std_logic_vector(DataWidth-1 downto 0);
+	i_py    : in 	std_logic_vector(DataWidth-1 downto 0);
+    i_qx    : in 	std_logic_vector(DataWidth-1 downto 0);
+	i_qy    : in 	std_logic_vector(DataWidth-1 downto 0);
+	o_rx	: out 	std_logic_vector(DataWidth-1 downto 0);
+	o_ry	: out 	std_logic_vector(DataWidth-1 downto 0)
     );
 end ellyptic_add;
 architecture behave of ellyptic_add is
   begin
 	  p_SUM : process (i_clk, i_rst_l)
-	  variable alpha : std_logic_vector(DataWidth downto 0);
-	  variable tmp_rx: std_logic_vector(DataWidth downto 0);
-	  variable tmp_ry: std_logic_vector(DataWidth downto 0);
+	  variable alpha : std_logic_vector(DataWidth-1 downto 0);
+	  variable tmp_rx: std_logic_vector(DataWidth-1 downto 0);
+	  variable tmp_ry: std_logic_vector(DataWidth-1 downto 0);
 	  begin
 		if i_rst_l = '0' then             
 			o_rx <= (others => '0');

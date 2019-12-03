@@ -1,56 +1,61 @@
 library IEEE;
 use IEEE.STD_Logic_1164.all, IEEE.Numeric_STD.all;
 entity GCD is
-generic (Width: natural);
-port (Clock,Reset,Load: in std_logic;
-   A,B:   in unsigned(Width-1 downto 0);
-   Done:  out std_logic;
-   Y:     out unsigned(Width-1 downto 0));
+generic (DataWidth: natural);
+port(
+	i_clk: 	in 	std_logic;
+	i_rst: 	in 	std_logic;
+	i_a:   	in 	std_logic_vector(DataWidth-1 downto 0);
+	i_b:   	in 	std_logic_vector(DataWidth-1 downto 0);
+	o_x:  	out std_logic_vector(DataWidth-1 downto 0);
+	o_y:  	out std_logic_vector(DataWidth-1 downto 0);
+	o_gcd:  out std_logic_vector(DataWidth-1 downto 0)
+	);
 end entity GCD;
 architecture RTL of GCD is
-   signal A_New,A_Hold,B_Hold: unsigned(Width-1 downto 0);
-   signal A_lessthan_B: std_logic;
 begin
-----------------------------------------------------
--- Load 2 input registers and ensure B_Hold < A_Hold
----------------------------------------------------
-LOAD_SWAP: process (Clock)
-begin
-   if rising_edge(Clock) then
-     if (Reset = '0') then
-       A_Hold <= (others => '0');
-       B_Hold <= (others => '0');
-     elsif (Load = '1') then
-       A_Hold <= A;
-       B_Hold <= B;
-     else if (A_lessthan_B = '1') then
-       A_Hold <= B_Hold;
-       B_Hold <= A_New;
-     else A_Hold <= A _New;
-     end if;
-   end if;
-end process LOAD_SWAP;
-SUBTRACT_TEST: process (A_Hold, B_Hold)
-begin
-   -------------------------------------------------------
-   -- Subtract B_Hold from A_Hold if A_Hold >= B_Hold
-   ------------------------------------------------------
-   if (A_Hold >= B_Hold) then
-      A_lessthan_B <= '0';
-      A_New <= A_Hold - B_Hold;
-   else
-      A_lessthan_B <= '1';
-      A_New <= A_Hold;
-   end if;
-   -------------------------------------------------
-   -- Greatest common divisor found if B_Hold = 0
-   -------------------------------------------------
-   if (B_Hold = (others => '0')) then
-      Done <= '1';
-      Y <= A_Hold;
-   else
-      Done <= '0';
-      Y <= (others => '0');
-   end if;
-end process SUBTRACT_TEST;
+	substract_test: process (i_clk, i_rst)
+		variable s: 		std_logic_vector(DataWidth-1 downto 0):=(others => '0');
+		variable old_s: 	std_logic_vector(DataWidth-1 downto 0):=(0 => '1', others => '0');
+		variable t: 		std_logic_vector(DataWidth-1 downto 0):=(0 => '1', others => '0');
+		variable old_t: 	std_logic_vector(DataWidth-1 downto 0):=(others => '0');
+		variable r: 		std_logic_vector(DataWidth-1 downto 0):=(others => '0');
+		variable old_r: 	std_logic_vector(DataWidth-1 downto 0):=(others => '0');
+		variable quotient: std_logic_vector(DataWidth-1 downto 0):=(others => '0');
+		variable tmp: 	std_logic_vector(DataWidth-1 downto 0):=(others => '0');
+		variable done: boolean := false;
+		begin
+			if i_rst = '0' then             
+				o_x <= (others => '0');
+				o_y <= (others => '0');
+				o_gcd <= (others => '0');
+			elsif rising_edge(i_clk) then
+				if (r=(r'range => '0')) and (old_r=(old_r'range => '0')) and (done/=true) then
+					if i_a > i_b then
+						old_r := i_a;
+						r	  := i_b;
+					else
+						old_r := i_b;
+						r	  := i_a;
+					end if;
+				end if;
+				if r/=(r'range => '0') and (done/=true) then
+					quotient:= std_logic_vector((signed(signed(old_r) /signed(r))));
+					tmp :=  old_r;
+					old_r := r;
+					r := std_logic_vector(signed(tmp) - resize((signed(quotient) * signed(r)),r'length));
+					tmp :=  old_s;
+					old_s := s;
+					s := std_logic_vector(signed(tmp) - resize((signed(quotient) * signed(s)),s'length));
+					tmp :=  old_t;
+					old_t := t;
+					t := std_logic_vector(signed(tmp) - resize((signed(quotient) * signed(t)),t'length));
+				else
+					done:=true;
+					o_gcd <= old_r;
+					o_x <= old_s;
+					o_y <= old_t;
+				end if;
+			end if;
+		end process substract_test;
 end architecture RTL;
