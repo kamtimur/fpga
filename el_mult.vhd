@@ -66,12 +66,12 @@ architecture behave of ellyptic_mult is
 					o_ry <= (others => '0');
 					iteration:=0;
 					iteration_complete:=0;
-					current_rx 	<= std_logic_vector(to_signed(0, DataWidth+1));
-					current_ry 	<= std_logic_vector(to_signed(0, DataWidth+1));
+					current_rx 	<= std_logic_vector(to_signed(0, DataWidth));
+					current_ry 	<= std_logic_vector(to_signed(0, DataWidth));
 					i_rst_adder <= '0';
 				elsif rising_edge(i_clk) then
 					iteration_num := to_integer((signed(i_n) - 1));
-					if (o_rx_adder/=std_logic_vector(to_signed(0, DataWidth+1))) and (o_ry_adder/=std_logic_vector(to_signed(0, DataWidth+1))) then	
+					if (o_rx_adder/=std_logic_vector(to_signed(0, DataWidth))) and (o_ry_adder/=std_logic_vector(to_signed(0, DataWidth))) then	
 						if iteration > 0 then
 							current_rx <= o_rx_adder;
 							current_ry <= o_ry_adder;
@@ -83,7 +83,7 @@ architecture behave of ellyptic_mult is
 						end if;
 					i_rst_adder <= '0';
 					end if;
-					if (o_rx_adder=std_logic_vector(to_signed(0, DataWidth+1))) and (o_ry_adder=std_logic_vector(to_signed(0, DataWidth+1))) and (iteration = iteration_complete) and (iteration_complete < iteration_num)then	
+					if (o_rx_adder=std_logic_vector(to_signed(0, DataWidth))) and (o_ry_adder=std_logic_vector(to_signed(0, DataWidth))) and (iteration = iteration_complete) and (iteration_complete < iteration_num)then	
 						i_rst_adder <= '1';
 						if iteration_complete=0 then
 							i_px_adder <= i_x;

@@ -1,6 +1,6 @@
 library IEEE;
 use IEEE.STD_Logic_1164.all, IEEE.Numeric_STD.all;
-entity GCD is
+entity gcd is
 generic (DataWidth: natural);
 port(
 	i_clk: 	in 	std_logic;
@@ -11,8 +11,8 @@ port(
 	o_y:  	out std_logic_vector(DataWidth-1 downto 0);
 	o_gcd:  out std_logic_vector(DataWidth-1 downto 0)
 	);
-end entity GCD;
-architecture RTL of GCD is
+end entity gcd;
+architecture behave of gcd is
 begin
 	substract_test: process (i_clk, i_rst)
 		variable s: 		std_logic_vector(DataWidth-1 downto 0):=(others => '0');
@@ -29,15 +29,13 @@ begin
 				o_x <= (others => '0');
 				o_y <= (others => '0');
 				o_gcd <= (others => '0');
+				r:=(r'range => '0');
+				old_r:=(old_r'range => '0');
+				done:=false;
 			elsif rising_edge(i_clk) then
-				if (r=(r'range => '0')) and (old_r=(old_r'range => '0')) and (done/=true) then
-					if i_a > i_b then
-						old_r := i_a;
-						r	  := i_b;
-					else
-						old_r := i_b;
-						r	  := i_a;
-					end if;
+				if (r=(r'range => '0')) and (old_r=(old_r'range => '0')) and (done/=true) and (i_a>(i_a'range => '0')) and (i_b>(i_b'range => '0')) then
+					old_r := i_a;
+					r	  := i_b;
 				end if;
 				if r/=(r'range => '0') and (done/=true) then
 					quotient:= std_logic_vector((signed(signed(old_r) /signed(r))));
@@ -58,4 +56,4 @@ begin
 				end if;
 			end if;
 		end process substract_test;
-end architecture RTL;
+end architecture behave;
