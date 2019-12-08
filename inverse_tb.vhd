@@ -7,7 +7,7 @@ entity inverse_tb is
 end;
 
 architecture bench of inverse_tb is
-  constant DataWidth : integer := 24;
+  constant DataWidth : integer := 257;
   component inverse
   generic (DataWidth: natural);
   port(
@@ -39,6 +39,7 @@ begin
                              o_res     => o_res );
 
   stimulus: process
+  variable rev: signed(DataWidth-1 downto 0);
   begin
   
     -- Put initialisation code here
@@ -49,10 +50,11 @@ begin
     wait for 5 ns;
 
     -- Put test bench stimulus code here
-	i_n <= std_logic_vector(to_signed(26, DataWidth));
-	i_p <= std_logic_vector(to_signed(3, DataWidth));
+	i_n <= "01001000001110101101101001110111001001101010001111000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+	i_p <= "01111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111011111111111111111111110000101111";
 	wait for clock_period*100;
-	assert o_res = std_logic_vector(to_signed(2, DataWidth)) report "error" severity error;
+	rev:=(signed(i_n)*signed(o_res)) mod signed(i_p);
+	assert to_signed(1, DataWidth) = rev report "error" severity error;
 	
     stop_the_clock <= true;
     wait;

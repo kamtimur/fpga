@@ -57,20 +57,22 @@ architecture behave of ellyptic_mult is
 			o_rx      => o_rx_adder,
 			o_ry      => o_ry_adder);
 		p_MULT : process (i_clk, i_rst_l)
-			variable iteration: integer;
-			variable iteration_complete: integer;
-			variable iteration_num: integer;
+			variable iteration: unsigned(DataWidth-1 downto 0);
+			variable iteration_complete: unsigned(DataWidth-1 downto 0);
+			variable iteration_num: unsigned(DataWidth-1 downto 0);
+			variable i_n_u: unsigned(DataWidth-1 downto 0);
 			begin
 				if i_rst_l = '0' then             
 					o_rx <= (others => '0');
 					o_ry <= (others => '0');
-					iteration:=0;
-					iteration_complete:=0;
+					iteration:=(others => '0');
+					iteration_complete:=(others => '0');
 					current_rx 	<= std_logic_vector(to_signed(0, DataWidth));
 					current_ry 	<= std_logic_vector(to_signed(0, DataWidth));
 					i_rst_adder <= '0';
 				elsif rising_edge(i_clk) then
-					iteration_num := to_integer((signed(i_n) - 1));
+					i_n_u := unsigned(i_n);
+					iteration_num :=i_n_u - 1;
 					if (o_rx_adder/=std_logic_vector(to_signed(0, DataWidth))) and (o_ry_adder/=std_logic_vector(to_signed(0, DataWidth))) then	
 						if iteration > 0 then
 							current_rx <= o_rx_adder;
@@ -81,21 +83,21 @@ architecture behave of ellyptic_mult is
 							o_rx <= o_rx_adder;
 							o_ry <= o_ry_adder;
 						end if;
-					i_rst_adder <= '0';
+						i_rst_adder <= '0';
 					end if;
-					if (o_rx_adder=std_logic_vector(to_signed(0, DataWidth))) and (o_ry_adder=std_logic_vector(to_signed(0, DataWidth))) and (iteration = iteration_complete) and (iteration_complete < iteration_num)then	
-						i_rst_adder <= '1';
-						if iteration_complete=0 then
-							i_px_adder <= i_x;
-							i_py_adder <= i_y;
-						end if;
-						if iteration_complete>0 then
-							i_px_adder <= current_rx;
-							i_py_adder <= current_ry;
-						end if;
-						if iteration = iteration_complete then
-							iteration := iteration+1;
-						end if;
+					if (o_rx_adder=std_logic_vector(to_signed(0, DataWidth))) and (o_ry_adder=std_logic_vector(to_signed(0, DataWidth))) and (iteration = iteration_complete) and (iteration_complete < iteration_num) then	
+							if iteration_complete=0 then
+								i_px_adder <= i_x;
+								i_py_adder <= i_y;
+							end if;
+							if iteration_complete>0 then
+								i_px_adder <= current_rx;
+								i_py_adder <= current_ry;
+							end if;
+							if iteration = iteration_complete then
+								iteration := iteration+1;
+								i_rst_adder <= '1';
+							end if;
 					end if;
 				end if;
 			end process p_MULT;

@@ -8,7 +8,7 @@ entity GCD_tb is
 end;
 
 architecture bench of GCD_tb is
-  constant DataWidth : integer := 24;
+  constant DataWidth : integer := 257;
   component GCD
   generic (DataWidth: natural);
   port(
@@ -16,8 +16,8 @@ architecture bench of GCD_tb is
   	i_rst: 	in 	std_logic;
   	i_a:   	in 	std_logic_vector(DataWidth-1 downto 0);
   	i_b:   	in 	std_logic_vector(DataWidth-1 downto 0);
-  	o_x:  	out std_logic_vector(DataWidth-1 downto 0);
-  	o_y:  	out std_logic_vector(DataWidth-1 downto 0);
+  	o_x:  	out std_logic_vector(DataWidth*2-1 downto 0);
+  	o_y:  	out std_logic_vector(DataWidth*2-1 downto 0);
   	o_gcd:  out std_logic_vector(DataWidth-1 downto 0)
   	);
   end component;
@@ -26,8 +26,8 @@ architecture bench of GCD_tb is
   signal i_rst: std_logic;
   signal i_a: std_logic_vector(DataWidth-1 downto 0);
   signal i_b: std_logic_vector(DataWidth-1 downto 0);
-  signal o_x: std_logic_vector(DataWidth-1 downto 0);
-  signal o_y: std_logic_vector(DataWidth-1 downto 0);
+  signal o_x: std_logic_vector(DataWidth*2-1 downto 0);
+  signal o_y: std_logic_vector(DataWidth*2-1 downto 0);
   signal o_gcd: std_logic_vector(DataWidth-1 downto 0) ;
 
   constant clock_period: time := 10 ns;
@@ -56,12 +56,14 @@ begin
     wait for 5 ns;
 
     -- Put test bench stimulus code here
-	i_a <= std_logic_vector(to_signed(180, DataWidth));
-	i_b <= std_logic_vector(to_signed(150, DataWidth));
-	wait for clock_period*100;
-	assert o_x = std_logic_vector(to_signed(1, DataWidth)) report "error x" severity error;
-	assert o_y = std_logic_vector(to_signed(-1, DataWidth)) report "error y" severity error;
-    assert o_gcd = std_logic_vector(to_signed(30, DataWidth)) report "error gcd" severity error;
+
+  -- 65341020041517633956166170261014086368942546761318486551877808671514674964848 
+	i_b <= "01001000001110101101101001110111001001101010001111000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+  -- 115792089237316195423570985008687907853269984665640564039457584007908834671663
+	i_a <= "01111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111011111111111111111111110000101111";
+  wait for clock_period*100;
+  assert signed(o_gcd) > 0 report "gcd <=0" severity error;
+  assert o_gcd =std_logic_vector(resize((signed(o_x)*signed(i_a) + signed(o_y)*signed(i_b)),o_gcd'length))  report "error gcd" severity error;
 
 	stop_the_clock <= true;
     wait;

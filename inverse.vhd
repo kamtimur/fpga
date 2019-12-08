@@ -18,13 +18,13 @@ architecture behave of inverse is
 		i_rst: 	in 	std_logic;
 		i_a:   	in 	std_logic_vector(DataWidth-1 downto 0);
 		i_b:   	in 	std_logic_vector(DataWidth-1 downto 0);
-		o_x:  	out std_logic_vector(DataWidth-1 downto 0);
-		o_y:  	out std_logic_vector(DataWidth-1 downto 0);
+		o_x:  	out std_logic_vector(DataWidth*2-1 downto 0);
+		o_y:  	out std_logic_vector(DataWidth*2-1 downto 0);
 		o_gcd:  out std_logic_vector(DataWidth-1 downto 0)
 	);
 	end component;
-	signal o_x_gcd : std_logic_vector(DataWidth-1 downto 0);
-	signal o_y_gcd : std_logic_vector(DataWidth-1 downto 0);
+	signal o_x_gcd : std_logic_vector(DataWidth*2-1 downto 0);
+	signal o_y_gcd : std_logic_vector(DataWidth*2-1 downto 0);
 	signal o_gcd_res: std_logic_vector(DataWidth-1 downto 0);
 begin
 	gcd_component: gcd
@@ -39,16 +39,16 @@ begin
 		o_gcd     => o_gcd_res
 		);
 	main: process (i_clk, i_rst)
-		variable tmp1:signed(DataWidth-1 downto 0);
-		variable tmp2:signed(DataWidth-1 downto 0);
+		variable tmp1:signed(DataWidth*2-1 downto 0);
+		variable tmp2:signed(DataWidth*2-1 downto 0);
 		variable sum:signed(DataWidth-1 downto 0);
 		begin
 			if i_rst = '0' then             
 				o_res 		<= (others => '0');
 			elsif rising_edge(i_clk) then
 				if (o_gcd_res /= (DataWidth-1 downto 0 => '0')) and (o_x_gcd /= (DataWidth-1 downto 0 => '0')) and (o_y_gcd /= (DataWidth-1 downto 0 => '0')) then
-					tmp1 := resize((signed(o_x_gcd) * signed(i_n)),DataWidth);
-					tmp2 := resize((signed(o_y_gcd) * signed(i_p)),DataWidth);
+					tmp1 := resize((signed(o_x_gcd) * signed(i_n)),tmp1'length);
+					tmp2 := resize((signed(o_y_gcd) * signed(i_p)),tmp2'length);
 					sum  := (tmp1+tmp2) mod signed(i_p);
 					assert o_gcd_res=std_logic_vector(sum) report "gcd error" severity error;
 					o_res <= std_logic_vector(signed(o_x_gcd) mod signed(i_p));
